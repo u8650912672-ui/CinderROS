@@ -29,6 +29,11 @@ enable_a20:
     
     int 0x13
     jc error
+    mov si, dap_pagetables
+    mov ah, 0x42
+    mov dl, [boot_drive]
+    int 0x13
+    jc error
 
     ;load gdt and switch proc mode
 
@@ -74,7 +79,6 @@ pm_entry:
     wrmsr
     mov eax, cr0
 
-    or eax, cr0
     or eax, (1 << 31)
     mov cr0, eax
 
@@ -116,8 +120,8 @@ dap_kernel:
     db 0x10
     db 0x00
     dw 64
-    dw 0x0000
-    dw 0x1000
+    dw 0x0010
+    dw 0xFFFF
     dd 2
     dd 0
 
@@ -128,7 +132,7 @@ dap_pagetables:
     dw 24
     dw 0x0000
     dw 0x8000
-    dd 4
+    dd 66
     dd 0
 
 

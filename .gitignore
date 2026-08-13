@@ -1,1 +1,7 @@
 *bin
+tools/ 
+*.o
+cinder.img
+kernel.elf
+.gitignore
+cinder.iso

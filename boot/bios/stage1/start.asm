@@ -1,9 +1,11 @@
 ;start of stage 1 and a new beginning :3
 
+
 [org 0x7C00]  ;bios load
 [bits 16]  ; Real mode 
 
 ; Nr1 start of segments and stack 
+    mov [boot_drive], dl
     xor ax, ax
     mov ds, ax
     mov es, ax
