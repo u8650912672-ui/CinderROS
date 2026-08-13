@@ -19,7 +19,7 @@ KERNEL_ELF := build/kernel.elf
 
 KERNEL_BIN := $(BIOSDIR)/kernel.bin
 
-.PHONY: all image bins toolchain flash clean
+.PHONY: all image bins toolchain flash clean iso
 
 all: image
 REQUIRE_CC = @if [ "$(CC)" = "MISSING" ] || [ ! -x "$(CC)" ]; then \
@@ -86,6 +86,12 @@ image: bins
 	    esac; \
 	done
 	@echo; echo "Image is ready: $(IMG)"
+iso: image
+	@mkdir -p iso
+	@cp $(IMG) iso/cinder.img
+	@truncate -s 1474560 iso/cinder.img
+	xorriso -as mkisofs -o cinder.iso -b cinder.img -c boot.cat -R -J iso/
+	@echo "ISO ready: cinder.iso"
 #flash 
 flash: image
 	@echo "MAKE SURE YOU KNOW THE CORRECT PATH OFTEN /dev/sda OR SIMULAR"
@@ -96,7 +102,7 @@ flash: image
 	dd if=$(IMG) of=$(DEV) bs=512 conv=notrunc status=progress
 
 clean:
-	rm -rf build $(IMG)
+	rm -rf build $(IMG) cinder.iso iso/cinder.img
 
 iso: image
 	@mkdir -p iso
