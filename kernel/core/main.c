@@ -8,12 +8,17 @@ static int str_eq(const char *a, const char *b) {
 __attribute__((noreturn))
 void kmain(void) { //here da kernel starts this time it works
     vga_clear();
+    idt_init();
+    pic_init();
     vga_print("CROS PRE-alpha stage :3 \n");
     vga_print("print clear for help wait no fuck help for clear WIAH AHHHH help for help and clear for clear \n");
 
     char line[128];
     int n = 0;
     keyboard_init(); // it will sit here like a good boy i threw it here cuz i need it somewhere and there were space here
+    idt_init();
+    pic_init();
+    __asm__ volatile("sti");
     vga_print("good boys/girls type here ->");
     for (;;) {
         char c = keyboard_getc();

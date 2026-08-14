@@ -6,4 +6,6 @@ void vga_putchar(char c);
 void vga_print(const char *s);
 void keyboard_init(void);
 char keyboard_getc(void);
+void idt_init(void);
+void pic_init(void);
 #endif
