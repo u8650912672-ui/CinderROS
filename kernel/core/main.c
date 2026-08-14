@@ -5,7 +5,7 @@ static int str_eq(const char *a, const char *b) {
     while (*a && *a == *b) { a++; b++; }
     return *a == *b;
 }
-__attribute__((section(".text.entry"), noreturn))
+__attribute__((noreturn))
 void _start(void) { //here da kernel starts this time it works
     vga_clear();
     vga_print("CROS PRE-alpha stage :3 \n");

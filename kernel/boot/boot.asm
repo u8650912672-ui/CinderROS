@@ -28,7 +28,7 @@ gdt:
 gdt_end:
 gdtr:
     dw gdt_end - gdt - 1
-    dq gdt
+    dd gdt
 _start:
     cli
     cld
@@ -51,7 +51,7 @@ _start:
     mov eax, 0x83
     xor ecx, ecx
 .fill_pd:
-    mov [pd + ecx * 8], eax
+    mov [PD + ecx * 8], eax
     add eax, 0x200000
     inc ecx
     cmp ecx, 64
