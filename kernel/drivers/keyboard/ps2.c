@@ -5,16 +5,12 @@
 #define KBBUF 64
 static volatile unsigned char kbuf[KBBUF];
 static volatile int khead = 0, ktail = 0;
-static volatile unsigned long irq_cnt = 0;
 void kbd_irq(void) {
-    irq_cnt++;
     unsigned char sc = inb(KBD_DATA);
     int next = (khead + 1) % KBBUF;
     if (next == ktail) return;
     kbuf[khead] = sc; khead = next;
 }
-unsigned long kbd_irqs(void) { return irq_cnt; }
-int kbd_pending(void) { int n = khead - ktail; if (n < 0) n += KBBUF; return n; }
 static int shift = 0;
 static int caps = 0;
 static int ext = 0;
