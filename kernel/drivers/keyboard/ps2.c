@@ -69,7 +69,7 @@ void keyboard_init(void) { // i wounder if i could reuse the one i made in cbos
         if (kbd_wait_data(100000)) inb(KBD_DATA);
     kbd_send_dev(0xF0); //asks for your scancodes and passwords and also hacks your wifi and install a trojan into your bios to spy on you when you use soemthing /this is a joke 
     if (kbd_wait_data(100000)) inb(KBD_DATA);
-    kbd_send_dev(0x01) //I waant set 1 plsss :3
+    kbd_send_dev(0x01); //I waant set 1 plsss :3
     if (kbd_wait_data(100000)) inb(KBD_DATA);
     outb(0x64, 0xAE); //and finally after 20 different sanity checks this will compile first try and work
     kbd_drain(); //i forgot this :sob:    
