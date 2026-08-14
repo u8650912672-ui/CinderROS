@@ -5,6 +5,9 @@
 
 ;save boot drive
     mov [boot_drive], dl
+    cli
+    mov al, 'A'
+    call printch
 
 ;enable A20 line
 enable_a20:
@@ -22,6 +25,8 @@ enable_a20:
     out 0x92, al
 
 .a20_ok:
+    mov al, 'B'
+    call printch
 ;load kernel from disk to 0x100000
     mov si, dap_kernel
     mov ah, 0x42
@@ -29,11 +34,15 @@ enable_a20:
     
     int 0x13
     jc error
+    mov al, 'C'
+    call printch
     mov si, dap_pagetables
     mov ah, 0x42
     mov dl, [boot_drive]
     int 0x13
     jc error
+    mov al, 'D'
+    call printch
 
     ;load gdt and switch proc mode
 
@@ -56,6 +65,7 @@ pm_entry:
     mov fs, ax 
     mov gs, ax
     mov ss, ax
+    mov byte [0xB8000], 'P'
 
     mov esp, 0x90000
 
@@ -81,14 +91,18 @@ pm_entry:
 
     or eax, (1 << 31)
     mov cr0, eax
+    mov byte [0xB8002], 'Q'
 
     ;jump to 64 bit code hopefully
     jmp 0x18:lm_entry
 
 
+
     ;LONG MODE 64
 [bits 64]
 lm_entry:
+    mov rax, 0xB8004
+    mov byte [rax], 'L'
     mov rsp, 0x90000
     jmp 0x100000
 
@@ -111,6 +125,10 @@ print16:
 .done:
     ret
 
+printch:
+    mov ah, 0x0E
+    int 0x10
+    ret
 ;da- i jsut remeberd why the fuck am i writing comments if i dont need them? its not like others will read them...
 
 boot_drive db 0
@@ -155,7 +173,7 @@ gdt:
 
     dw 0xFFFF
     dw 0x0000
-    dd 0x00
+    db 0x00
     db 0x9A
     db 0xAF
     db 0x00

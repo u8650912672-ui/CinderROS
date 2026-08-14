@@ -104,9 +104,3 @@ flash: image
 clean:
 	rm -rf build $(IMG) cinder.iso iso/cinder.img
 
-iso: image
-	@mkdir -p iso
-	@cp $(IMG) iso/cinder.img
-	@truncate -s 1474560 iso/cinder.img
-	xorriso -as mkisofs -o cinder.iso -b cinder.img -c boot.cat -R -J iso/
-	@echo "ISO ready: cinder.iso"

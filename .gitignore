@@ -5,3 +5,4 @@ cinder.img
 kernel.elf
 .gitignore
 cinder.iso
+disk.img

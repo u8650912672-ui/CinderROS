@@ -5,6 +5,7 @@
 [bits 16]  ; Real mode 
 
 ; Nr1 start of segments and stack 
+    cli
     mov [boot_drive], dl
     xor ax, ax
     mov ds, ax
