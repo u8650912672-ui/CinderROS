@@ -14,7 +14,7 @@
     mov sp, 0x7C00 ;stack grows down from 0x7C00
 
     ;nr 2 set text mode IF THIS DONT WORK MANUALLY CHANGE IT TO mov ax, 0x0003 
-    call set_80x50
+    call set_vga
     ;nr3 boot msg
     mov si, msg_boot
     call print
@@ -57,58 +57,15 @@ print:
 .done:
     ret
 
-    ;nr 7 set the vga 80x50
-set_80x50:
+    ;nr 7 set the vga 80x50 (it dont do anymore i jsut set a normal vga)
+set_vga:
     mov ax, 0x0003
-    int 0x10
-
-    mov ax, 0x1112
-    mov bl, 0x00
-    int 0x10
-
-    mov dx, 0x3D4
-    mov al, 0x09
-    out dx, al
-
-    inc dx
-    in al, dx
-    and al, 0xE0
-
-    or al, 0x07
-    out dx, al
-
-    ;set vertical display end to 400 scanlines
-    dec dx
-    mov al, 0x12
-    out dx, al
-
-    inc dx
-    mov al, 0x8F
-    out dx, al
-
-    ;set a overflow register ( 8 bit of vertical)
-    dec dx
-    mov al, 0x07
-    out dx, al
-
-    inc dx
-    in al, dx
-    or al, 0x02
-
-    out dx, al
-
-    ;clear screen
-    mov ax, 0x0600
-    mov bh, 0x07
-    xor cx, cx
-
-    mov dx, 0x184F
     int 0x10
     ret
 
     ;nr 8 data
 msg_boot db "stage1: Loading into stage2 standy...", 13, 10, 0
-msg_error db "AN ERROR HAS OCCURED: Error>could not load stage2.-1", 13, 10, 0
+msg_error db "Error has happend -> could not load stage2. ERROR CODE: -1", 13, 10, 0
 
 boot_drive db 0x80 ;return and boot the default drive
 

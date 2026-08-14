@@ -1,4 +1,6 @@
 #include <kernel.h>
+#include <io.h>
+
 static int str_eq(const char *a, const char *b) {
     while (*a && *a == *b) { a++; b++; }
     return *a == *b;
@@ -41,6 +43,6 @@ void _start(void) { //here da kernel starts this time it works
                 vga_putchar(c);
             }
         }
-        __asm__ volatile("hlt");
+        __asm__ volatile("pause");
     }
 }
