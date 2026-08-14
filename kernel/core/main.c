@@ -5,11 +5,16 @@ static int str_eq(const char *a, const char *b) {
     while (*a && *a == *b) { a++; b++; }
     return *a == *b;
 }
+
+static void print_hex(unsigned long v) {
+    const char *d = "0123456789ABCDEF";
+    for (int sh = 60; sh >= 0; sh -= 4)
+        vga_putchar(d[(v >> sh) & 0xF]);
+    vga_putchar(' ');
+}
 __attribute__((noreturn))
 void kmain(void) { //here da kernel starts this time it works
     vga_clear();
-    idt_init();
-    pic_init();
     vga_print("CROS PRE-alpha stage :3 \n");
     vga_print("print clear for help wait no fuck help for clear WIAH AHHHH help for help and clear for clear \n");
 
@@ -21,6 +26,13 @@ void kmain(void) { //here da kernel starts this time it works
     __asm__ volatile("sti");
     vga_print("good boys/girls type here ->");
     for (;;) {
+        static unsigned long dbgcnt = 0;
+        if ((dbgcnt++ & 0x3FFFFF) == 0) {
+            vga_print("S="); print_hex(inb(0x64));
+            vga_print("I="); print_hex(kbd_irqs());
+            vga_print("P="); print_hex((unsigned long)kbd_pending());
+            vga_putchar('\n');
+        }
         char c = keyboard_getc();
         if (c) {
             if (c == '\n') {

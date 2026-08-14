@@ -5,12 +5,16 @@
 #define KBBUF 64
 static volatile unsigned char kbuf[KBBUF];
 static volatile int khead = 0, ktail = 0;
+static volatile unsigned long irq_cnt = 0;
 void kbd_irq(void) {
+    irq_cnt++;
     unsigned char sc = inb(KBD_DATA);
     int next = (khead + 1) % KBBUF;
     if (next == ktail) return;
     kbuf[khead] = sc; khead = next;
-} 
+}
+unsigned long kbd_irqs(void) { return irq_cnt; }
+int kbd_pending(void) { int n = khead - ktail; if (n < 0) n += KBBUF; return n; }
 static int shift = 0;
 static int caps = 0;
 static int ext = 0;
@@ -86,7 +90,7 @@ void keyboard_init(void) { // i wounder if i could reuse the one i made in cbos
     outb(0x64, 0x20);
     if (kbd_wait_data(100000)) {
         uint8_t cfg = inb(0x60);
-        cfg &= ~0x40; //hopefully clears teh translation 
+        cfg = (cfg & ~0x40) | 0x01; //hopefully clears teh translation 
         while (inb(KBD_STATUS) & 2); //wait for input buffer to be empty
         outb(0x64, 0x60); //command write config
         outb(0x60, cfg);

@@ -9,4 +9,6 @@ char keyboard_getc(void);
 void idt_init(void);
 void pic_init(void);
 void kbd_irq(void);
+unsigned long kbd_irqs(void);
+int kbd_pending(void);
 #endif
