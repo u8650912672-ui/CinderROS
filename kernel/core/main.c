@@ -12,7 +12,7 @@ void _start(void) { //here da kernel starts this time it works
     char line[128];
     int n = 0;
 
-    vga_print("good boys/girls type here ->")
+    vga_print("good boys/girls type here ->");
     for (;;) {
         char c = keyboard_getc();
         if (c) {
