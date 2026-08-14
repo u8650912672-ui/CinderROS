@@ -70,12 +70,16 @@ pm_entry:
     mov esp, 0x90000
 
     cld
+    mov esi, 0x10000
+    mov edi, 0x100000
+    mov ecx, 0x2000
+    rep movsb
+
+    
     mov esi, 0x80000
     mov edi, 0x200000
-    
     mov ecx, 0x3000
     rep movsb
-    mov eax, cr4
 
     or eax, (1 << 5) | (1 << 7)
     mov cr4, eax
@@ -137,9 +141,9 @@ msg_error db "Loader: error loading kernel or the pages :d", 13, 10, 0
 dap_kernel:
     db 0x10
     db 0x00
-    dw 64
-    dw 0x0010
-    dw 0xFFFF
+    dw 16
+    dw 0x0000
+    dw 0x1000
     dd 2
     dd 0
 

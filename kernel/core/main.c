@@ -1,10 +1,9 @@
+void vga_clear(void);
+void vga_print(const char *s);
+
 __attribute__((section(".text.entry"), noreturn))
 void _start(void) { // here da kernel starts havent been written
-    const char msg[] = "CROS";
-    volatile char *fb = (volatile char *)0xB8000;
-    for (int i = 0; msg[i]; i++) {
-        fb[i * 2] = msg[i];
-        fb[i * 2 + 1] = 0x0F;
-    }
+    vga_clear();
+    vga_print("Hello Femboys~");
     for (;;) asm volatile("hlt");
 }
