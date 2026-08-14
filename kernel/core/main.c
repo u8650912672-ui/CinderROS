@@ -6,7 +6,7 @@ static int str_eq(const char *a, const char *b) {
     return *a == *b;
 }
 __attribute__((noreturn))
-void _start(void) { //here da kernel starts this time it works
+void kmain(void) { //here da kernel starts this time it works
     vga_clear();
     vga_print("CROS PRE-alpha stage :3 \n");
     vga_print("print clear for help wait no fuck help for clear WIAH AHHHH help for help and clear for clear \n");
