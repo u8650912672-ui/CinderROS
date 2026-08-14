@@ -21,7 +21,7 @@ KERNEL_ELF := build/kernel.elf
 all:
 	@read -p "Heyyyy is this may be your first time, do you know what you are doing?  [y/N]: " ans; \
 	case "$$ans" in y|Y|yes|Yes|YES) \
-	    echo "cool, building the iso for you"; $(MAKE) iso;; \
+	     $(MAKE) iso;; \
 	*) echo "no worries, building the iso for you"; $(MAKE) iso;; \
 	esac
 

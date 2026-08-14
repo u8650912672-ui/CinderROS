@@ -13,7 +13,7 @@ void kmain(void) { //here da kernel starts this time it works
 
     char line[128];
     int n = 0;
-
+    keyboard_init(); // it will sit here like a good boy i threw it here cuz i need it somewhere and there were space here
     vga_print("good boys/girls type here ->");
     for (;;) {
         char c = keyboard_getc();
