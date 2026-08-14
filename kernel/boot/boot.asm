@@ -1,4 +1,4 @@
-;start of stage 1 and a new beginning :3
+;start of boot.asm
 ;Grub enters start in 32 bit proc mode with paging off i think so doign bits 32 should work
 ;also since this makes teh loader.asm and page_tables.asm useless ill remove them from this repo
 
