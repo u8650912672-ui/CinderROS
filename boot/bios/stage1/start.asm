@@ -1,86 +1,105 @@
 ;start of stage 1 and a new beginning :3
+;Grub enters start in 32 bit proc mode with paging off i think so doign bits 32 should work
+;also since this makes teh loader.asm and page_tables.asm useless ill remove them from this repo
 
+BITS 32
 
-[org 0x7C00]  ;bios load
-[bits 16]  ; Real mode 
-
-; Nr1 start of segments and stack 
+section .multiboot
+align 8
+mb_header_start:
+    dd 0xE85250D6 ;so called "magic"
+    dd 0
+    dd mb_header_end - mb_header_start ;this is the length
+    dd -(0xE85250D6 + 0 + (mb_header_end - mb_header_start))
+    dw 0 ;simple end tag
+    dw 0
+    dd 8
+mb_header_end:
+; also mb stands for multiboot for your info
+section .boottext
+global _start
+extern kmain
+extern __bss_start, __bss_end
+gdt:
+;gdt is painful cuz i have to FUCKING COUNT THE 32 BIT HEXBINARY BS
+    dq 0x0000000000000000 ;same as dq 0 but its for visual
+    dq 0x00AF9A000000FFFF ;0x08
+    dq 0x00CF92000000FFFF 
+gdt_end:
+gdtr:
+    dw gdt_end - gdt - 1
+    dq gdt
+_start:
     cli
-    mov [boot_drive], dl
-    xor ax, ax
-    mov ds, ax
-    mov es, ax
-    mov ss, ax
-    mov sp, 0x7C00 ;stack grows down from 0x7C00
+    cld
+    cmp eax, 0x36D76289
+    jne .hang
+    mov esp, stack_top
+    
+    mov edi, __bss_start
+    mov ecx, __bss_end
+    sub ecx, edi
+    xor eax, eax
+    rep stosb
 
-    ;nr 2 set text mode IF THIS DONT WORK MANUALLY CHANGE IT TO mov ax, 0x0003 
-    call set_vga
-    ;nr3 boot msg
-    mov si, msg_boot
-    call print
-    ;nr 4 load stage 2 from disk try lab first the fallback to CHS
-    mov si, disk_address_packet
-    mov ah, 0x42
-    mov dl, [boot_drive]
-    int 0x13
-    jnc .load_ok
+    mov eax, PDP
+    or eax, 0x3
+    mov [PML4], eax
+    mov eax, PD 
+    or eax, 0x3
+    mov [PDP], eax
+    mov eax, 0x83
+    xor ecx, ecx
+.fill_pd:
+    mov [pd + ecx * 8], eax
+    add eax, 0x200000
+    inc ecx
+    cmp ecx, 64
+    jb .fill_pd
 
-    ;if lba not supported it will do this (CHS FALLBACK)
-    mov ax, 0x0201
-    mov bx, 0x7E00
-    mov cx, 0x0002
-    mov dh, 0
-    mov dl, [boot_drive]
-    int 0x13
-    jc error
-
-.load_ok:
-    ;stage2 loaded seccessfully at 0x0000:0x7E0
-    jmp 0x0000:0x7E00
-
-    ;nr 5 error handeling
-error:
-    mov si, msg_error
-    call print
+    mov eax, cr4
+    or eax, 0x20
+    mov cr4, eax
+    ;longmode enable (64 bit)
+    mov ecx, 0xC0000080
+    rdmsr
+    or eax, 0x100
+    wrmsr
+    ;here cr3 -> PML4
+    mov eax, PML4
+    mov cr3, eax
+    ;then paging goes from off to on
+    mov eax, cr0
+    or eax, 0x80000000
+    mov cr0, eax
+    ; gdt -> long mode
+    lgdt [gdtr]
+    jmp 0x08:start64
+.hang:
     cli
     hlt
-    jmp error ;in case of NMI or wakeup :p
+    jmp .hang
+;and now we enter 64 bit and leave shitty 32 behind
+BITS 64
+start64:
+    mov ax, 0x10
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+    mov ss, ax
+    mov rsp, stack_top
+    call kmain
+.hang64:
+    cli
+    hlt
+    jmp .hang64
 
-    ;nr 6 helper and i/o without o
-print:
-    lodsb
-    or al, al
-    jz .done
-    mov ah, 0x0E
-    int 0x10
-    jmp print
-.done:
-    ret
-
-    ;nr 7 set the vga 80x50 (it dont do anymore i jsut set a normal vga)
-set_vga:
-    mov ax, 0x0003
-    int 0x10
-    ret
-
-    ;nr 8 data
-msg_boot db "stage1: Loading into stage2 standy...", 13, 10, 0
-msg_error db "Error has happend -> could not load stage2. ERROR CODE: -1", 13, 10, 0
-
-boot_drive db 0x80 ;return and boot the default drive
-
-disk_address_packet:
-    db 0x10
-    db 0x00
-    dw 1
-    dw 0x7E00
-    dw 0x0000
-    dd 1
-    dd 0
-
-
-    ;nr 9 boot signature to make it bootable
-    times 510 - ($ - $$) db 0
-    dw 0xAA55
-
-
+    section .bss align 16
+    stack_bottom:
+        resb 16384
+    stack_top:
+    align 4096
+PML4: resb 4096
+PDP:  resb 4096
+PD:   resb 4096
