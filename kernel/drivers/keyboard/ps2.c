@@ -2,8 +2,18 @@
 #include <stdint.h>
 #define KBD_DATA   0x60
 #define KBD_STATUS 0x64
+#define KBBUF 64
+static volatile unsigned char kbuf[KBBUF];
+static volatile int khead = 0, ktail = 0;
+void kbd_irq(void) {
+    unsigned char sc = inb(KBD_DATA);
+    int next = (khead + 1) % KBBUF;
+    if (next == ktail) return;
+    kbuf[khead] = sc; khead = next;
+} 
 static int shift = 0;
 static int caps = 0;
+static int ext = 0;
 //more comments finally i am a lazy fuck tho also i think alreyd did thsi so il steal from a past project
 static const char normal_map[128] = {
     0,   27,  '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', '\b',
@@ -28,26 +38,26 @@ static const char shift_map[128] = {
     0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
     0
 };
-static int ext = 0;
 char keyboard_getc(void) {
-    if (!(inb(KBD_STATUS) & 1)) return 0; //this means no data ak fuck off
-    uint8_t sc = inb(KBD_DATA);
-    if (ext) { ext = 0; return 0; }
-    if (sc == 0xE0) { ext = 1; return 0; }
-    if (sc & 0x80) {
-        uint8_t k = sc & 0x7F;
-        if (k == 0x2A || k == 0x36) shift = 0;
-        return 0;
+    while (khead != ktail) {
+        uint8_t sc = kbuf[ktail];
+        ktail = (ktail + 1) % KBBUF;
+        if (ext) { ext = 0; continue; }
+        if (sc == 0xE0) { ext = 1; continue; }
+        if (sc & 0x80) {
+            uint8_t k = sc & 0x7F;
+            if (k == 0x2A || k == 0x36) shift = 0;
+            continue;
+        }
+        if (sc == 0x2A || sc == 0x36) { shift = 1; continue; }
+        if (sc == 0x3A) { caps = !caps; continue; }
+        char c = normal_map[sc];
+        if (shift) c = shift_map[sc];
+        else if (caps && c >= 'a' && c <= 'z') c = (char)(c - ('a' - 'A'));
+        return c;
     }
-    if (sc == 0x2A || sc == 0x36) { shift = 1; return 0; }
-    if (sc == 0x3A) { caps = !caps; return 0; }
-    char c = normal_map[sc];
-    if (shift)
-        c = shift_map[sc];
-    else if (caps && c >= 'a' && c <= 'z')
-        c = (char)(c - ('a' - 'A')); //fixed the stupid bug i borrowed from cbos :/
-    return c;
-}
+    return 0;
+} // sorry for the lack of comments in these commits i just cant be bother commenting rn since i am running into major problems every singel boot
 static void kbd_drain(void) {
     while (inb(KBD_STATUS) & 1) inb(KBD_DATA);
 }
@@ -73,4 +83,12 @@ void keyboard_init(void) { // i wounder if i could reuse the one i made in cbos
     if (kbd_wait_data(100000)) inb(KBD_DATA);
     outb(0x64, 0xAE); //and finally after 20 different sanity checks this will compile first try and work
     kbd_drain(); //i forgot this :sob:    
+    outb(0x64, 0x20);
+    if (kbd_wait_data(100000)) {
+        uint8_t cfg = inb(0x60);
+        cfg &= ~0x40; //hopefully clears teh translation 
+        while (inb(KBD_STATUS) & 2); //wait for input buffer to be empty
+        outb(0x64, 0x60); //command write config
+        outb(0x60, cfg);
+    }
 }

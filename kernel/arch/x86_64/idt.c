@@ -28,7 +28,11 @@ static void idt_set_gate(uint8_t n, uint64_t h) {
     idt[n].attr = 0x8E; //present ring 0 64 bit interrupter gate
     idt[n].zero = 0;
 }
-void irq_handler(void) { outb(0x20, 0x20); }
+void kbd_irq(void);
+void irq_handler(void) {
+    kbd_irq();
+    outb(0x20, 0x20);
+}
 void idt_init(void) {
     for (int i = 0; i < 256; i++)
         idt_set_gate(i, (uint64_t)isr_stub); // this means every vector is the same stub

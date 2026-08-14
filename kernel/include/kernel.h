@@ -8,4 +8,5 @@ void keyboard_init(void);
 char keyboard_getc(void);
 void idt_init(void);
 void pic_init(void);
+void kbd_irq(void);
 #endif
