@@ -10,7 +10,10 @@
 # NOT THAT THIS ONLY BOOTS CSM MODE NOT UEFI RIGTH NOW
 
 
-
+# What people is this aimd to? 
+## this os is aimed at people who develep or want something that i made for some reason
+## or just something small or uniqe :)
 
 # REQUREMENTS TO BUILD 
 ## ~1gb of storage to download tools 
+
