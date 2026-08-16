@@ -7,7 +7,7 @@ static void print_uint(unsigned long v, int base, int upper) {
     char buf[20]; int n = 0;
     do {
         int d = v % base;
-        buf[n++] = d < 10 ? (char)('0' + d)
+        buf[n++] = d < 10 ? (char)('0' + d) :
                             (char)((upper ? 'A' : 'a') + (d - 10));
         v /= base;
     } while (v);

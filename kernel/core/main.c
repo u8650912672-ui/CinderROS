@@ -33,6 +33,8 @@ void kmain(void) { //here da kernel starts this time it works
                     vga_print("commands: help, clear, uwu, shutdown\n");
                 else if (str_eq(line, "clear"))
                     vga_clear();
+                else if (str_eq(line, "femboy"))
+                    vga_print("awe your a femboy? :3 good have some pats *pat pat pat*")
                 else if (str_eq(line, "uwu"))
                     vga_print("Hello femboy *pat pat pat* tihi ;3\n");
                 else if (str_eq(line, "shutdown")) {

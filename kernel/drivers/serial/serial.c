@@ -11,8 +11,8 @@ void ser_init(void) {  //115200 baud
     //i just noticed i forgot to put ; ON EVERY SINGEL FUCKING ONE WHEN I DID THIS FIRST TIME 
     //HOLY SHIT no wounder it didnt fucking compile
 }
-void set_putc(char c) {
+void ser_putc(char c) {
     while (!(inb(COM1 + 5) & 0x20)); //wait thr empty
     outb(COM1, c); //also if anyone is woundering yes i am using a ref sheet tutorial and ai for help i am stupid okay?
 }
-void set_print(const char *s) { while (*s) set_putc(*s++); }
+void ser_print(const char *s) { while (*s) ser_putc(*s++); }
