@@ -11,7 +11,14 @@ mb_header_start:
     dd 0
     dd mb_header_end - mb_header_start ;this is the length
     dd -(0xE85250D6 + 0 + (mb_header_end - mb_header_start))
-    dw 0 ;simple end tag
+    align 8
+    dd 5 ;this is now frame buffer request tag :3
+    dd 20 ;this is the size
+    dd 0 ;hopefully if its 0 grub picks
+    dd 0 ; again hope grub picks for me
+    dd 32 ;this is depth so 32 bpp RGB?
+    align 8
+    dw 0 ; end tag
     dw 0
     dd 8
 mb_header_end:
@@ -40,7 +47,8 @@ _start:
     mov ecx, __bss_end
     sub ecx, edi
     xor eax, eax
-    rep stosb
+    rep stosb 
+    mov [mb2_info], ebx ; save multiboot2 info pointer :3
 
     mov eax, PDP
     or eax, 0x3
@@ -89,6 +97,7 @@ start64:
     mov gs, ax
     mov ss, ax
     mov rsp, stack_top
+    mov rdi, [mb2_info] ;rdi is mb2 info -> kmain mb2
     call kmain
 .hang64:
     cli
@@ -101,5 +110,7 @@ start64:
     stack_top:
     align 4096
 PML4: resb 4096
-PDP:  resb 4096
-PD:   resb 4096
+PDP: resb 4096
+PD: resb 4096
+mb2_info:
+    resq 1

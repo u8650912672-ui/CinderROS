@@ -8,7 +8,7 @@ static int str_eq(const char *a, const char *b) {
 
 
 __attribute__((noreturn))
-void kmain(void) { //here da kernel starts this time it works
+void kmain(uint64_t mb2) { //here da kernel starts this time it works
     vga_clear();
     ser_init();
     printf("CROS PRE-alpha stage :3 \n");
@@ -21,7 +21,7 @@ void kmain(void) { //here da kernel starts this time it works
     idt_init();
     pic_init();
     __asm__ volatile("sti");
-    vga_print("good boys/girls type here ->");
+    vga_print(" :3 good boys/girls type here ->");
     for (;;) {
         char c = keyboard_getc();
         if (c) {
