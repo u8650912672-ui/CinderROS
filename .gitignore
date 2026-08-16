@@ -5,3 +5,7 @@ cinder.img
 kernel.elf
 cinder.iso
 disk.img
+.fd
+my_vars.fd
+OVMF_CODE.fd
+OVMF_VARS.fd

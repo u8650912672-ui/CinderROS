@@ -14,8 +14,8 @@ mb_header_start:
     align 8
     dd 5 ;this is now frame buffer request tag :3
     dd 20 ;this is the size
-    dd 0 ;hopefully if its 0 grub picks
-    dd 0 ; again hope grub picks for me
+    dd 1024 ;hopefully if its 0 grub picks
+    dd 768 ; again hope grub picks for me
     dd 32 ;this is depth so 32 bpp RGB?
     align 8
     dw 0 ; end tag

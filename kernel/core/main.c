@@ -9,11 +9,23 @@ static int str_eq(const char *a, const char *b) {
 
 __attribute__((noreturn))
 void kmain(uint64_t mb2) { //here da kernel starts this time it works
-    vga_clear();
+    dclear();
     ser_init();
+    struct fb_info fb;
+    int has_mb2 = mb2_get_framebuffer(mb2, &fb);   // <-- parse BEFORE the guard
+    printf("mb2 has=%d bpp=%u addr=%x pitch=%u %ux%u\n",
+           has_mb2, fb.bpp, (uint32_t)fb.addr, (uint32_t)fb.pitch,
+           (uint32_t)fb.width, (uint32_t)fb.height);
+    if (!has_mb2 && (fb.bpp == 32 || fb.bpp == 24)) {
+        uint64_t end = fb.addr + (uint64_t)fb.pitch * fb.height;
+        for (uint64_t a = fb.addr; a < end; a += 0x200000)
+            map_page_2m(a);
+        fb_init(fb.width, fb.height, fb.pitch, fb.bpp, fb.addr);
+    }
+    printf("map+init done, fb_active=%d\n", fb_active());
     printf("CROS PRE-alpha stage :3 \n");
     printf("shell booted at %x (com1 serial: init'ed) \n", 0xDEADBEEF);
-    vga_print("print clear for help wait no fuck help for clear WIAH AHHHH help for help and clear for clear \n");
+    dprint("print clear for help wait no fuck help for clear WIAH AHHHH help for help and clear for clear \n");
 
     char line[128];
     int n = 0;
@@ -21,35 +33,35 @@ void kmain(uint64_t mb2) { //here da kernel starts this time it works
     idt_init();
     pic_init();
     __asm__ volatile("sti");
-    vga_print(" :3 good boys/girls type here ->");
+    dprint(" :3 good boys/girls type here ->");
     for (;;) {
         char c = keyboard_getc();
         if (c) {
             if (c == '\n') {
-                vga_putchar('\n');
+                dputchar('\n');
                 line[n] = '\0';
 
                 if (str_eq(line, "help"))
-                    vga_print("commands: help, clear, uwu, shutdown\n");
+                    dprint("commands: help, clear, uwu, shutdown\n");
                 else if (str_eq(line, "clear"))
-                    vga_clear();
+                    dclear();
                 else if (str_eq(line, "femboy"))
-                    vga_print("awe your a femboy? :3 good have some pats *pat pat pat*\n");
+                    dprint("awe your a femboy? :3 good have some pats *pat pat pat*\n");
                 else if (str_eq(line, "uwu"))
-                    vga_print("Hello femboy *pat pat pat* tihi ;3\n");
+                    dprint("Hello femboy *pat pat pat* tihi ;3\n");
                 else if (str_eq(line, "shutdown")) {
                     outw(0xB004, 0x2000);  //THIS IS NOT FOR PROBLEMS THIS IS QEMU ONLY SHIT
                     for (;;) asm volatile("hlt");
                 } else if (n > 0)
-                    vga_print("thats not a command... mabye check fi your dyslexic :3?\n");
+                    dprint("thats not a command... mabye check fi your dyslexic :3?\n");
                 
                 n = 0;
-                vga_print("# > ");
+                dprint("# > ");
             }else if (c == '\b') {
-                if (n > 0) { n--; vga_putchar('\b'); }
+                if (n > 0) { n--; dputchar('\b'); }
             }else if (n < 127) {
                 line[n++] = c;
-                vga_putchar(c);
+                dputchar(c);
             }
         }
         __asm__ volatile("pause");

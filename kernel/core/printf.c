@@ -1,7 +1,7 @@
 #include <stdarg.h>
 #include <kernel.h>
 
-static void sink(char c) { vga_putchar(c); ser_putc(c); }
+static void sink(char c) { dputchar(c); ser_putc(c); }
 
 static void print_uint(unsigned long v, int base, int upper) {
     char buf[20]; int n = 0;

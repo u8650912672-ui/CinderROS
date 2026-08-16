@@ -30,4 +30,7 @@ void fb_init(uint32_t w, uint32_t h, uint32_t pitch, uint8_t bpp, uint64_t addr)
 void fb_putchar(char c);
 void fb_clear(void);
 int fb_active(void);
+void dputchar(char c);
+void dprint(const char *s);
+void dclear(void);
 #endif
