@@ -10,7 +10,9 @@ static int str_eq(const char *a, const char *b) {
 __attribute__((noreturn))
 void kmain(void) { //here da kernel starts this time it works
     vga_clear();
-    vga_print("CROS PRE-alpha stage :3 \n");
+    ser_init();
+    printf("CROS PRE-alpha stage :3 \n");
+    printf("shell booted at %x (com1 serial: init'ed) \n", 0xDEADBEEF);
     vga_print("print clear for help wait no fuck help for clear WIAH AHHHH help for help and clear for clear \n");
 
     char line[128];

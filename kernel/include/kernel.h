@@ -11,4 +11,8 @@ void pic_init(void);
 void kbd_irq(void);
 unsigned long kbd_irqs(void);
 int kbd_pending(void);
+void ser_init(void);
+void ser_putc(char);
+void ser_print(const char *s);
+void printf(const char *fmt, ...);
 #endif
