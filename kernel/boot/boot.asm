@@ -12,12 +12,14 @@ mb_header_start:
     dd mb_header_end - mb_header_start ;this is the length
     dd -(0xE85250D6 + 0 + (mb_header_end - mb_header_start))
     align 8
-    dd 5 ;this is now frame buffer request tag :3
+%ifdef CROS_UEFI
+    dd 5 ;this is now frame buffer request tag :3 (UEFI build only)
     dd 20 ;this is the size
-    dd 1024 ;hopefully if its 0 grub picks
-    dd 768 ; again hope grub picks for me
+    dd 1024
+    dd 768
     dd 32 ;this is depth so 32 bpp RGB?
     align 8
+%endif
     dw 0 ; end tag
     dw 0
     dd 8

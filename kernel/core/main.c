@@ -12,17 +12,12 @@ void kmain(uint64_t mb2) { //here da kernel starts this time it works
     dclear();
     ser_init();
     struct fb_info fb;
-    int has_mb2 = mb2_get_framebuffer(mb2, &fb);   // <-- parse BEFORE the guard
-    printf("mb2 has=%d bpp=%u addr=%x pitch=%u %ux%u\n",
-           has_mb2, fb.bpp, (uint32_t)fb.addr, (uint32_t)fb.pitch,
-           (uint32_t)fb.width, (uint32_t)fb.height);
-    if (!has_mb2 && (fb.bpp == 32 || fb.bpp == 24)) {
+    if (!mb2_get_framebuffer(mb2, &fb) && (fb.bpp == 32 || fb.bpp == 24)) {
         uint64_t end = fb.addr + (uint64_t)fb.pitch * fb.height;
         for (uint64_t a = fb.addr; a < end; a += 0x200000)
             map_page_2m(a);
         fb_init(fb.width, fb.height, fb.pitch, fb.bpp, fb.addr);
     }
-    printf("map+init done, fb_active=%d\n", fb_active());
     printf("CROS PRE-alpha stage :3 \n");
     printf("shell booted at %x (com1 serial: init'ed) \n", 0xDEADBEEF);
     dprint("print clear for help wait no fuck help for clear WIAH AHHHH help for help and clear for clear \n");
