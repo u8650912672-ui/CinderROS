@@ -9,3 +9,4 @@ disk.img
 my_vars.fd
 OVMF_CODE.fd
 OVMF_VARS.fd
+/build

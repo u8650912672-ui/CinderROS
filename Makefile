@@ -16,8 +16,6 @@ ASM_SRCS := $(shell find kernel -name '*.asm')
 KOBJS := $(patsubst kernel/%.c,$(BIOSDIR)/kernel/%.o,$(C_SRCS)) \
          $(patsubst kernel/%.asm,$(BIOSDIR)/kernel/%.o,$(ASM_SRCS))
 KERNEL_ELF := build/kernel.elf
-UEFI_KOBJS := $(subst /kernel/boot/boot.o,/kernel/boot/boot.uefi.o,$(KOBJS))
-KERNEL_ELF_U := build/kernel-uefi.elf
 
 .PHONY: all check toolchain clean iso
 all:
@@ -49,9 +47,6 @@ $(BIOSDIR)/kernel/%.o: kernel/%.c | check
 $(BIOSDIR)/kernel/%.o: kernel/%.asm | check
 	@mkdir -p $(dir $@)
 	$(NASM) -f elf64 $< -o $@
-$(BIOSDIR)/kernel/boot/boot.uefi.o: kernel/boot/boot.asm | check
-	@mkdir -p $(dir $@)
-	$(NASM) -f elf64 -DCROS_UEFI $< -o $@
 $(KERNEL_ELF): $(KOBJS) kernel/linker.ld
 	$(REQUIRE_CC)
 	$(CC) -nostdlib -static -no-pie $(KOBJS) -o $@ \
@@ -61,11 +56,10 @@ $(KERNEL_ELF_U): $(UEFI_KOBJS) kernel/linker.ld
 	$(CC) -nostdlib -static -no-pie $(UEFI_KOBJS) -o $@ \
 	    -Wl,-m,elf_x86_64 -Wl,-T,kernel/linker.ld -lgcc
 
-iso: $(KERNEL_ELF) $(KERNEL_ELF_U)
+iso: $(KERNEL_ELF)
 	@rm -rf iso
 	@mkdir -p iso/boot/grub
 	@cp $(KERNEL_ELF) iso/boot/kernel.elf
-	@cp $(KERNEL_ELF_U) iso/boot/kernel-uefi.elf
 	@cp boot/grub.cfg iso/boot/grub/grub.cfg
 	$(GRUB_MKRESCUE) -o $(ISO) iso/
 	@echo "ISO ready: $(ISO)"

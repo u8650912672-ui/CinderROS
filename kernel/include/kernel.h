@@ -26,6 +26,7 @@ struct fb_info {
     int present;
 };
 int mb2_get_framebuffer(uint64_t info, struct fb_info *out);
+int gop_init(uint64_t mb2);
 void fb_init(uint32_t w, uint32_t h, uint32_t pitch, uint8_t bpp, uint64_t addr);
 void fb_putchar(char c);
 void fb_clear(void);

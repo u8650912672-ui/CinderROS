@@ -6,17 +6,22 @@ static int str_eq(const char *a, const char *b) {
     return *a == *b;
 }
 
-
 __attribute__((noreturn))
 void kmain(uint64_t mb2) { //here da kernel starts this time it works
+    
     dclear();
     ser_init();
-    struct fb_info fb;
-    if (!mb2_get_framebuffer(mb2, &fb) && (fb.bpp == 32 || fb.bpp == 24)) {
-        uint64_t end = fb.addr + (uint64_t)fb.pitch * fb.height;
-        for (uint64_t a = fb.addr; a < end; a += 0x200000)
-            map_page_2m(a);
-        fb_init(fb.width, fb.height, fb.pitch, fb.bpp, fb.addr);
+    if (gop_init(mb2) != 0) {
+        struct fb_info fb;
+        if (!mb2_get_framebuffer(mb2, &fb) && (fb.bpp == 32 || fb.bpp == 24)) {
+            uint64_t end = fb.addr + (uint64_t)fb.pitch * fb.height;
+            for (uint64_t a = fb.addr; a < end; a += 0x200000)
+                map_page_2m(a);
+            fb_init(fb.width, fb.height, fb.pitch, fb.bpp, fb.addr);
+            volatile uint8_t *raw = (volatile uint8_t *)(uintptr_t)fb.addr;
+            for (uint64_t i = 0; i < 160000 && i < (uint64_t)fb.pitch * fb.height; i++)
+                raw[i] = 0xFF;
+        }
     }
     printf("CROS PRE-alpha stage :3 \n");
     printf("shell booted at %x (com1 serial: init'ed) \n", 0xDEADBEEF);

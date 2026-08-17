@@ -11,15 +11,8 @@ mb_header_start:
     dd 0
     dd mb_header_end - mb_header_start ;this is the length
     dd -(0xE85250D6 + 0 + (mb_header_end - mb_header_start))
-    align 8
-%ifdef CROS_UEFI
-    dd 5 ;this is now frame buffer request tag :3 (UEFI build only)
-    dd 20 ;this is the size
-    dd 1024
-    dd 768
-    dd 32 ;this is depth so 32 bpp RGB?
-    align 8
-%endif
+    
+;yes i just deleted 15-22 FUCK YOU GONNA DO?=??
     dw 0 ; end tag
     dw 0
     dd 8
