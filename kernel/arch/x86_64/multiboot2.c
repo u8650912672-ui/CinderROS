@@ -21,7 +21,7 @@ int mb2_get_framebuffer(uint64_t info, struct fb_info *out) {
         uint32_t type = *(uint32_t *)off;
         uint32_t size = *(uint32_t *)(off + 4);
         if (type == 0) break; //end tag
-        if (type == 5 && size >= 32) { // frame buffer tag
+        if (type == 8 && size >= 32) { // frame buffer tag
             struct mb2_tag_fb *t = (struct mb2_tag_fb *)off;
             out->addr = t->addr;
             out->pitch = t->pitch;

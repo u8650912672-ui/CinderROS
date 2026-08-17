@@ -14,7 +14,7 @@ int gop_init(uint64_t info) {
         uint32_t type = *(uint32_t *)off;
         uint32_t size = *(uint32_t *)(off + 4);
         if (type == 0) break;
-        if (type == 12 && size >= 24) { st = *(uint64_t *)(off + 8); break; }
+        if (type == 12 && size >= 16) { st = *(uint64_t *)(off + 8); break; }
         off += (size + 7) & ~7;
     }
     if (!st) return 1;
@@ -22,17 +22,17 @@ int gop_init(uint64_t info) {
     for (uint64_t a = 0; a < 0x100000000ULL; a += 0x200000)
         map_page_2m(a);
 
-    uint64_t bs = *(uint64_t *)(st + 0x58);
-    lp_t locate = (lp_t)(*(uint64_t *)(bs + 0x140));
+    uint64_t bs = *(uint64_t *)(st + 0x60);
+    lp_t locate = (lp_t)(*(uint64_t *)(bs + 0x128));
     uint64_t gop = 0;
     if (locate((uint64_t)&gop_guid, 0, (uint64_t)&gop) != 0 || !gop)
         return 1;
     uint64_t mode = *(uint64_t *)(gop + 0x18);
-    uint64_t mi = *(uint64_t *)(mode + 0x20);
+    uint64_t mi  = *(uint64_t *)(mode + 0x20);
     uint32_t w = *(uint32_t *)(mi + 0x04);
     uint32_t h = *(uint32_t *)(mi + 0x08);
-    uint64_t fbb = *(uint64_t *)(mode + 0x30);
-    uint64_t fbs = *(uint64_t *)(mode + 0x38);
+    uint64_t fbb = *(uint64_t *)(mode + 0x18);
+    uint64_t fbs = *(uint64_t *)(mode + 0x08);
     if (!fbb || !w || !h || fbs < (uint64_t)w * h * 4)
         return 1;
     uint32_t pitch = (uint32_t)(fbs / h);

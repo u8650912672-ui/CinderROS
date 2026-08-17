@@ -11,7 +11,13 @@ mb_header_start:
     dd 0
     dd mb_header_end - mb_header_start ;this is the length
     dd -(0xE85250D6 + 0 + (mb_header_end - mb_header_start))
-    
+    align 8
+    dd 5   ; framebuffer request
+    dd 20
+    dd 0
+    dd 0
+    dd 0
+    align 8
 ;yes i just deleted 15-22 FUCK YOU GONNA DO?=??
     dw 0 ; end tag
     dw 0
