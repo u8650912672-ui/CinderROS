@@ -34,10 +34,6 @@ void fb_init(uint32_t w, uint32_t h, uint32_t p, uint8_t bpp, uint64_t addr) {
     if (!bpp_bytes) return;
     active = 0;
     fb_clear();
-    for (uint32_t y = 0; y < 16; y++)
-        for (uint32_t x = 0; x < width; x++)
-            for (uint8_t i = 0; i < bpp_bytes; i++)
-                fb[(uint64_t)y * pitch + (uint64_t)x * bpp_bytes + i] = 0xFF;
     active = 1;
 }
 
