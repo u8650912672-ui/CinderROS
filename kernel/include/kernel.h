@@ -34,4 +34,14 @@ int fb_active(void);
 void dputchar(char c);
 void dprint(const char *s);
 void dclear(void);
+void shell_run(void);
+void shell_exec(const char *line);
+int str_eq(const char *a, const char *b);
+int mb2_get_module(uint64_t info, uint64_t *addr, uint64_t *size);
+void ramfs_init(void);
+int ramfs_mkdir(const char *name);
+int ramfs_touch(const char *name);
+void ramfs_ls(void);
+int ramfs_cat(const char *name);
+void ramfs_load_tar(uint64_t addr, uint64_t size);
 #endif

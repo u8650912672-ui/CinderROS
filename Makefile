@@ -61,7 +61,9 @@ iso: $(KERNEL_ELF)
 	@mkdir -p iso/boot/grub
 	@cp $(KERNEL_ELF) iso/boot/kernel.elf
 	@cp boot/grub.cfg iso/boot/grub/grub.cfg
+	@tar --format=ustar -cf boot/initrd.tar -C boot/initrd .
+	@cp boot/initrd.tar iso/boot/initrd.tar
 	$(GRUB_MKRESCUE) -o $(ISO) iso/
 	@echo "ISO ready: $(ISO)"
 clean:
-	rm -rf build $(ISO) iso
+	rm -rf build $(ISO) iso boot/initrd.tar

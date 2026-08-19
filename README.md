@@ -1,13 +1,8 @@
 # READ THESE INSTRUCTIONS 
-### In order to run this you frist have to run make toolchain in the root of the project 
-### after you have run that you can then run make 
-### so steps are as follows 
-### make toolchain 
-### make 
-### IF YOU DONT KNOW WHAT TO ADD JUST PRESS Y ON ALL
-### after you done make and it says the img is done you can either make a iso (for ventoy/rufus) or use make flash to flash it on a usb stick 
-### after that it should be able to boot 
-# NOTE THAT THIS ONLY BOOTS CSM MODE NOT UEFI RIGTH NOW
+### In order to run this on a actual pc first run make toolchain if there is an error just donwload wget 
+### after its done run make && make iso you will get a iso
+### put it on a stick like ventoy or burn it (i have only tested on ventoy and it works)
+### unsure if it boots BIOS but UEFI works
 
 
 # What people is this aimd to? 

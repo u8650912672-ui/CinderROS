@@ -36,3 +36,20 @@ int mb2_get_framebuffer(uint64_t info, struct fb_info *out) {
     out->present = 0;
     return 1;
 }
+int mb2_get_module(uint64_t info, uint64_t *addr, uint64_t *size) {
+    uint32_t base = (uint32_t)info;
+    uint32_t end = base + *(uint32_t *)base;
+    uint32_t off = base + 8;
+    while (off + 8 <= end) {
+        uint32_t type = *(uint32_t *)off;
+        uint32_t sz = *(uint32_t *)(off + 4);
+        if (type == 0) break;
+        if (type == 3) {
+            *addr = *(uint32_t *)(off + 8);
+            *size = *(uint32_t *)(off + 12) - *(uint32_t *)(off + 8);
+            return 0;
+        }
+        off += (sz + 7) & ~7;
+    }
+    return 1;
+}
