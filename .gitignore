@@ -11,3 +11,4 @@ OVMF_CODE.fd
 OVMF_VARS.fd
 /build
 hello.txt
+initrd.tar
