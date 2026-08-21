@@ -1,6 +1,6 @@
 NASM := nasm
 ISO := cinder.iso
-GRUB_MKRESCUE := grub-mkrescue
+GRUB_MKRESCUE := x86_64-elf-grub-mkrescue
 
 BIOSDIR := build/bios
 TOOLS := $(wildcard tools/x86_64-elf-tools-*)
@@ -59,11 +59,25 @@ $(KERNEL_ELF_U): $(UEFI_KOBJS) kernel/linker.ld
 iso: $(KERNEL_ELF)
 	@rm -rf iso
 	@mkdir -p iso/boot/grub
+	@mkdir -p boot/initrd
+	@touch disk.img
 	@cp $(KERNEL_ELF) iso/boot/kernel.elf
 	@cp boot/grub.cfg iso/boot/grub/grub.cfg
 	@tar --format=ustar -cf boot/initrd.tar -C boot/initrd .
 	@cp boot/initrd.tar iso/boot/initrd.tar
 	$(GRUB_MKRESCUE) -o $(ISO) iso/
 	@echo "ISO ready: $(ISO)"
+
+run: iso
+	@echo "starting CinderROS"
+	@qemu-system-x86_64 \
+		-M pc \
+		-cpu qemu64 \
+		-m 4G \
+		-drive if=pflash,format=raw,readonly=on,file=boot/uefi/OVMF_CODE.fd \
+		-drive if=pflash,format=raw,file=boot/uefi/OVMF_VARS.fd \
+		-drive file=disk.img,format=raw,if=ide,index=0 \
+		-cdrom $(ISO)
+
 clean:
 	rm -rf build $(ISO) iso boot/initrd.tar
