@@ -32,24 +32,19 @@ static void cmd_echo(int argc, char **argv) {
     dputchar('\n');
 }
 
-static void cmd_poweroff(int argc, char **argv)
-{
+static void cmd_poweroff(int argc, char **argv) {
     __asm__ volatile("cli");
 
     outw(0x604, 0x2000); //qemu/bochs
-
-    for (volatile int i = 0; i < 10000000; i++) __asm__ volatile("nop");
 
     //fallback
     outw(0xB004, 0x2000);
     outw(0x0604, 0x2000);
 
-    for (volatile int i = 0; i < 10000000; i++) __asm__ volatile("nop");
-
     // now hope it works
 
-    __asm__ volatile("cli");
-    for (;;) __asm__ volatile("hlt");
+    for (volatile int i = 0; i < 10000000; i++) __asm__ volatile("nop");
+    for (;;) __asm__ volatile("hlt"); //halt if everything fails
 }
 
 static void cmd_mkdir(int argc, char **argv) {
