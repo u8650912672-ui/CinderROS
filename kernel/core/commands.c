@@ -20,9 +20,9 @@ static void cmd_uwu(int argc, char **argv) {
 }
 
 static void cmd_reboot(int argc, char **argv) {
-    outw(0xB004, 0x2000);
-    __asm__ volatile ("lidt %0" : : "m"(*(short[]){0})); //this is NOT how you are SUPPOSED TO REBOOT MUST AND WILL BE CHANGED IN THE FUTURE
-    __asm__ volatile ("int $0x3");
+    while (inb(0x64) & 0x02); //wait until the keyboard input buffer is free to stuff it full of reboot stuff :3
+    outb(0x64, 0xFE); //touch the CPU reset line WITH CONSENT
+    for (;;) __asm__ volatile ("hlt");
 }
 static void cmd_echo(int argc, char **argv) {
     for (int i = 1; i < argc; i++) {
@@ -74,6 +74,7 @@ void shell_exec(const char *line) {
         while (line[i] && line[i] != ' ') buf [w++] = line[i++];
         buf[w++] = 0;
     }
+    if (argc == 0) return;
     for (int j = 0; j < (int)(sizeof(cmds) / sizeof(cmds[0])); j++)
         if (str_eq(argv[0], cmds[j].name)) { cmds[j].fn(argc, argv); return; }
     if (argc > 0)
