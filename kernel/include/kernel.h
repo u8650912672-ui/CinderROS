@@ -44,4 +44,6 @@ int ramfs_touch(const char *name);
 void ramfs_ls(void);
 int ramfs_cat(const char *name);
 void ramfs_load_tar(uint64_t addr, uint64_t size);
+int ramfs_rm(const char *name);int ramfs_rm(const char *name);
+
 #endif

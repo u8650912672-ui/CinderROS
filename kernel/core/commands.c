@@ -8,7 +8,7 @@ int str_eq(const char *a, const char *b) {
 }
 
 static void cmd_help(int argc, char **argv) {
-    dprint("help commands include help (you are here) clear, uwu, reboot, echo mkdir touch (touch me too :3) ls cat (KITTYYYYY) \n");
+    dprint("help commands include help (you are here) clear, uwu, reboot, echo mkdir touch (touch me too :3) ls cat (KITTYYYYY) rm \n");
 }
 
 static void cmd_clear(int argc, char **argv) {
@@ -68,7 +68,12 @@ static void cmd_cat(int argc, char **argv) { //not much done i was kinda high
     if (argc < 2) { dprint("usage cat and dump info of file i think\n"); return; }
     if (ramfs_cat(argv[1]) < 0) dprint("cat didnt kitty or find the file\n");
 }
-static struct cmd {
+static void cmd_rm(int argc, char **argv) {
+    if (argc < 2) { dprint("use with rm and a name dummy\n"); return; }
+    if (ramfs_rm(argv[1]) < 0) dprint("look at this goofball he made a typo <3\n");
+}
+
+static struct cmd { 
     const char *name;
     void (*fn)(int argc, char **argv);
 } cmds[] = {
@@ -82,6 +87,7 @@ static struct cmd {
     { "touch", cmd_touch },
     { "ls", cmd_ls },
     { "cat", cmd_cat },
+    { "rm", cmd_rm },
 };
 
 void shell_exec(const char *line) {

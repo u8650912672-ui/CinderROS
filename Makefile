@@ -1,7 +1,10 @@
 NASM := nasm
 ISO := cinder.iso
-GRUB_MKRESCUE := x86_64-elf-grub-mkrescue
-
+ifneq ($(shell which x86_64-elf-grub-mkrescue 2>/dev/null),)
+    GRUB_MKRESCUE := x86_64-elf-grub-mkrescue
+else ifneq ($(shell which grub-mkrescue 2>/dev/null),)
+    GRUB_MKRESCUE := grub-mkrescue
+endif
 BIOSDIR := build/bios
 TOOLS := $(wildcard tools/x86_64-elf-tools-*)
 XC_CC := $(firstword $(wildcard tools/bin/x86_64-elf-gcc))

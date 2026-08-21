@@ -43,28 +43,41 @@ void ramfs_init(void) {
 }
 static struct ramfs_inode *ramfs_find(uint16_t dir, const char *name) {
     for (uint16_t i = 0; i < used; i++)
-        if (inodes[i].parent == dir && fs_cmp(inodes[i].name, name) == 0)
+        if (inodes[i].name[0] && inodes[i].parent == dir && fs_cmp(inodes[i].name, name) == 0)
             return &inodes[i];
         return 0;
 }
 
 
 int ramfs_mkdir(const char *name) {
-    if (used >= RAMFS_MAX || fs_len(name) >= RAMFS_NAME || ramfs_find(cwd, name)) return -1;
-    inodes[used].type = 0; inodes[used].size = 0; inodes[used].parent = cwd;
-    fs_cpy(inodes[used].name, name);
-    return used++;
+    if (fs_len(name) >= RAMFS_NAME || ramfs_find(cwd, name)) return -1;
+    for (uint16_t i = 0; i < RAMFS_MAX; i++) {
+        if (!inodes[i].name[0]) {
+            inodes[i].type = 0; inodes[i].size = 0; inodes[i].parent = cwd;
+            fs_cpy(inodes[i].name, name);
+            if (i >= used) used = i + 1;
+            return i;
+        }
+    }
+    return -1;
 }
+
 int ramfs_touch(const char *name) {
-    if (used >= RAMFS_MAX || fs_len(name) >= RAMFS_NAME || ramfs_find(cwd, name)) return -1;
-    inodes[used].type = 1; inodes[used].size = 0; inodes[used].parent = cwd;
-    fs_cpy(inodes[used].name, name);
-    return used++;
+    if (fs_len(name) >= RAMFS_NAME || ramfs_find(cwd, name)) return -1;
+    for (uint16_t i = 0; i < RAMFS_MAX; i++) {
+        if (!inodes[i].name[0]) {
+            inodes[i].type = 1; inodes[i].size = 0; inodes[i].parent = cwd;
+            fs_cpy(inodes[i].name, name);
+            if (i >= used) used = i + 1;
+            return i;
+        }
+    }
+    return -1;
 }
 
 void ramfs_ls(void) {
     for (uint16_t i = 0; i < used; i++) {
-        if (inodes[i].parent != cwd) continue;
+        if (!inodes[i].name[0] || inodes[i].parent != cwd) continue;
         dprint(inodes[i].name);
         dprint(inodes[i].type ? "\n" : "/\n");
     }
@@ -75,6 +88,16 @@ int ramfs_cat(const char *name) {
     for (uint16_t i = 0; i < f->size; i++) dputchar(f->data[i]);
     dputchar('\n');
     return 0;
+}
+int ramfs_rm(const char *name) {
+    for (uint16_t i = 1; i < used; i++) {
+        if (inodes[i].parent == cwd && fs_cmp(inodes[i].name, name) == 0) {
+            if (inodes[i].type == 0) return 0; //fuck folders lets make them fucking immune :)
+            inodes[i].name[0] = 0; //send your files to the shadow realm >:3
+            return 0;
+        }
+    }
+    return -1; //nothing to kill get skill issued
 }
 static int ramfs_add(const char *name, uint8_t type, const char *data, int size) {
     if (used >= RAMFS_MAX || fs_len(name) >= RAMFS_NAME) return -1;
