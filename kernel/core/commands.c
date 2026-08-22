@@ -8,7 +8,7 @@ int str_eq(const char *a, const char *b) {
 }
 
 static void cmd_help(int argc, char **argv) {
-    dprint("help commands include help (you are here) clear, uwu, reboot, echo mkdir touch (touch me too :3) ls cat (KITTYYYYY) rm \n");
+    dprint("help commands include help (you are here) clear, uptime, uwu, reboot, echo mkdir touch (touch me too :3) ls cat (KITTYYYYY) rm \n");
 }
 
 static void cmd_clear(int argc, char **argv) {
@@ -32,7 +32,7 @@ static void cmd_echo(int argc, char **argv) {
     dputchar('\n');
 }
 
-static void cmd_poweroff(int argc, char **argv) {
+static void cmd_poweroff_qemu(int argc, char **argv) {
     __asm__ volatile("cli");
 
     outw(0x604, 0x2000); //qemu/bochs
@@ -45,6 +45,17 @@ static void cmd_poweroff(int argc, char **argv) {
 
     for (volatile int i = 0; i < 10000000; i++) __asm__ volatile("nop");
     for (;;) __asm__ volatile("hlt"); //halt if everything fails
+}
+
+static void cmd_poweroff(int argc, char **argv) {
+    acpi_shutdown();
+    for (;;) __asm__ volatile("hlt");
+}
+//why do we have 2 power offs? well poweroff_qmeu if for qemu and was the first type of poweroff made by emex the second i made
+
+static void cmd_uptime(int argc, char **argv) {
+    uint64_t t = timer_ticks();
+    printf("time pased has %d and da uptime is %d seconds\n", t, t / 100);
 }
 
 static void cmd_mkdir(int argc, char **argv) {
@@ -76,13 +87,15 @@ static struct cmd {
     { "clear", cmd_clear },
     { "uwu", cmd_uwu },
     { "reboot", cmd_reboot },
-    { "poweroff", cmd_poweroff },
+    { "poweroff_qemu", cmd_poweroff_qemu },
     { "echo", cmd_echo },
     { "mkdir", cmd_mkdir },
     { "touch", cmd_touch },
     { "ls", cmd_ls },
     { "cat", cmd_cat },
     { "rm", cmd_rm },
+    { "poweroff", cmd_poweroff },
+    { "uptime", cmd_uptime }
 };
 
 void shell_exec(const char *line) {
@@ -97,6 +110,19 @@ void shell_exec(const char *line) {
         buf[w++] = 0;
     }
     if (argc == 0) return;
+    for (int j = 1; j < argc; j++) {
+        if (str_eq(argv[j], ">")) {
+            if (j + 1 >= argc) { dprint("echo into a file :/\n"); return; }
+            char text[256];
+            int t = 0;
+            for (int k = 1; k < j && t < 255; k++) {
+                if (k > 1) text[t++] = ' ';
+                for (int c = 0; argv[k][c] && t < 255; c++) text[t++] = argv[k][c];
+            }
+            ramfs_write(argv[j + 1], text, t);
+            return;
+        }
+    }
     for (int j = 0; j < (int)(sizeof(cmds) / sizeof(cmds[0])); j++)
         if (str_eq(argv[0], cmds[j].name)) { cmds[j].fn(argc, argv); return; }
     if (argc > 0)

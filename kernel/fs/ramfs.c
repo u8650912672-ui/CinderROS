@@ -99,6 +99,20 @@ int ramfs_rm(const char *name) {
     }
     return -1; //nothing to kill get skill issued
 }
+
+int ramfs_write(const char *name, const char *data, int len) {
+
+    struct ramfs_inode *f = ramfs_find(cwd, name);
+    if (!f) {
+        if (ramfs_touch(name) < 0) return -1;
+        f = ramfs_find(cwd, name);
+    }
+    if (f->type != 1) return 0;
+    if (len > RAMFS_DATA) len = RAMFS_DATA;
+    for (int i = 0; i < len; i++) f->data[i] = data[i];
+    f->size = (uint16_t)len;
+    return 0;
+}
 static int ramfs_add(const char *name, uint8_t type, const char *data, int size) {
     if (used >= RAMFS_MAX || fs_len(name) >= RAMFS_NAME) return -1;
     inodes[used].type = type;

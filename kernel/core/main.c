@@ -22,6 +22,7 @@ void kmain(uint64_t mb2) { //here da kernel starts this time it works
     keyboard_init();
     idt_init();
     pic_init();
+    pit_init(100); //for easier math 100 hz at 1 second means 100 ticks in 1 second :)
     __asm__ volatile("sti");
     shell_run();
 }

@@ -28,15 +28,24 @@ static void idt_set_gate(uint8_t n, uint64_t h) {
     idt[n].attr = 0x8E; //present ring 0 64 bit interrupter gate
     idt[n].zero = 0;
 }
+extern void isr_stub_32(void); //the stub the macro do
+extern void isr_stub_33(void); //keyboard
+
+void pit_irq(void);
 void kbd_irq(void);
-void irq_handler(void) {
-    kbd_irq();
-    outb(0x20, 0x20);
+void pic_eoi(int irq);
+
+void irq_handler(uint64_t vector) {
+    if (vector == 32) pit_irq();
+    else if (vector == 33) kbd_irq();
+    pic_eoi(vector - 32);
 }
+
 void idt_init(void) {
     for (int i = 0; i < 256; i++)
-        idt_set_gate(i, (uint64_t)isr_stub); // this means every vector is the same stub
+        idt_set_gate(i, (uint64_t)isr_stub_32); //default
+    idt_set_gate(33, (uint64_t)isr_stub_33); //keyboard mad keyboard want handler
+
     struct idt_ptr p = { sizeof(idt) - 1, (uint64_t)idt };
     __asm__ volatile("lidt %0" :: "m"(p));
 }
-

@@ -10,7 +10,7 @@
 
 
 # Medium priority-
-
+### fix the "poweroff" cmd from my shit as its currently the second reboot cmd :/
 
 
 

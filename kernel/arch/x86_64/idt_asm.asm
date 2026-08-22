@@ -1,8 +1,11 @@
 BITS 64
 section .text
 extern irq_handler
-global isr_stub
-isr_stub:
+
+%macro ISR_NOERR 1
+global isr_stub_%1
+isr_stub_%1:
+    push 0 ;dummy cuz cpu wants it
     push rax
     push rcx
     push rdx
@@ -12,7 +15,7 @@ isr_stub:
     push r9
     push r10
     push r11
-    cli
+    mov rdi, %1
     call irq_handler
     pop r11
     pop r10
@@ -23,5 +26,10 @@ isr_stub:
     pop rdx
     pop rcx
     pop rax
-    iretq
+    add rsp, 8 ;bye bye error
+    iretq ;ignore and walk away like nothin happend :)
+%endmacro
+
+ISR_NOERR 32
+ISR_NOERR 33
     ;thanks jonathan the genius asm and keyboard helper

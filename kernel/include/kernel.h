@@ -45,5 +45,9 @@ void ramfs_ls(void);
 int ramfs_cat(const char *name);
 void ramfs_load_tar(uint64_t addr, uint64_t size);
 int ramfs_rm(const char *name);int ramfs_rm(const char *name);
-
+int ramfs_write(const char *name, const char *data, int len);
+int acpi_shutdown(void);
+void pit_init(uint32_t freq);
+void pit_irq(void);
+uint64_t timer_ticks(void);
 #endif
