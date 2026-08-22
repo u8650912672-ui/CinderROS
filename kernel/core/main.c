@@ -19,6 +19,7 @@ void kmain(uint64_t mb2) { //here da kernel starts this time it works
     uint64_t maddr = 0, msize = 0;
     if (mb2_get_module(mb2, &maddr, &msize) == 0)
         ramfs_load_tar(maddr, msize);
+    gdt_init();
     keyboard_init();
     idt_init();
     pic_init();

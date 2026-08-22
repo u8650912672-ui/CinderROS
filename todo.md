@@ -11,6 +11,7 @@
 
 # Medium priority-
 ### fix the "poweroff" cmd from my shit as its currently the second reboot cmd :/
+### gdt.c set correct tss.rsp0 when i have a real stack
 
 
 

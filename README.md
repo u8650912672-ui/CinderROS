@@ -17,3 +17,10 @@
 ### last updated today (sun 16 aug)
 ### 6 days has passed on the 5th i didnt take my meds leading to no develepment :c
 ### school start soon will most likely slow down develepment :c
+
+
+
+
+
+# Credit to these people for the work they done / helped with
+## emex poweroff command and some other stuff

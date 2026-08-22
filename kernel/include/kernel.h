@@ -50,4 +50,5 @@ int acpi_shutdown(void);
 void pit_init(uint32_t freq);
 void pit_irq(void);
 uint64_t timer_ticks(void);
+void gdt_init(void);
 #endif

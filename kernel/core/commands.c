@@ -58,6 +58,14 @@ static void cmd_uptime(int argc, char **argv) {
     printf("time pased has %d and da uptime is %d seconds\n", t, t / 100);
 }
 
+static void cmd_neofetch(int argc, char **argv) {
+    dprint("  OS is cros :3\n");
+    dprint("  Kernel is mabye\n");
+    dprint("  Shell is implemented\n");
+    printf("  Uptime: %d sec\n", timer_ticks() / 100);
+    dprint("  Terminal migth work\n");
+    dprint("  CPU is hopefully running :)\n");
+}
 static void cmd_mkdir(int argc, char **argv) {
     if (argc < 2) { dprint("mkdir name boomn bap cool shit\n"); return; }
     if (ramfs_mkdir(argv[1]) < 0) dprint ("mdkir no create problm\n");
@@ -95,7 +103,8 @@ static struct cmd {
     { "cat", cmd_cat },
     { "rm", cmd_rm },
     { "poweroff", cmd_poweroff },
-    { "uptime", cmd_uptime }
+    { "uptime", cmd_uptime },
+    { "neofetch", cmd_neofetch },
 };
 
 void shell_exec(const char *line) {
