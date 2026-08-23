@@ -24,3 +24,25 @@ tss_flush:
     ret
     ;and done :D
     
+global ring3_entry
+ring3_entry:
+    cli
+    hlt
+    jmp ring3_entry
+
+global enter_ring3
+enter_ring3:
+    mov rax, 0x20 | 3
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+    push rax
+    push rsi
+    pushfq
+    pop rax
+    or rax, 0x200
+    push rax
+    push (0x18 | 3)
+    push rdi
+    iretq

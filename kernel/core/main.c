@@ -25,5 +25,21 @@ void kmain(uint64_t mb2) { //here da kernel starts this time it works
     pic_init();
     pit_init(100); //for easier math 100 hz at 1 second means 100 ticks in 1 second :)
     __asm__ volatile("sti");
-    shell_run();
+    char username[32];
+    int n = 0;
+    dprint("enter username: ");
+    for (;;) {
+        char c = keyboard_getc();
+        if (c) {
+            if (c == '\n') { dputchar('\n'); username[n] = '\0'; break; }
+            else if (c == '\b') { if (n > 0) { n--; dputchar('\b'); } }
+            else if (n < 31) { username[n++] = c; dputchar(c); }
+        }
+    }
+    if (str_eq(username, "gibmering0iamstupid")) {
+        shell_run();
+    } else {
+        dprint("entering userspace :3\n");
+        enter_userspace();
+    }
 }

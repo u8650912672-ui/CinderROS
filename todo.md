@@ -4,7 +4,7 @@
 
 
 # HIGH PRIORITY- 
-
+### Add shell in userspace stuff so shit dont run in ring0
 
 
 
