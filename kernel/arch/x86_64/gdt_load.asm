@@ -24,12 +24,16 @@ tss_flush:
     ret
     ;and done :D
     
+section .usercode align=4096 ; Put code in own section and page align it so that we can set the memory permissions easily
 global ring3_entry
 ring3_entry:
-    cli
-    hlt
-    jmp ring3_entry
+    mov rax, 0 ; ID for the test syscall
+    int 0x80
+.spin:
+    ; cli/hlt are ring 0 only, just spin
+    jmp .spin
 
+section .text
 global enter_ring3
 enter_ring3:
     mov rax, 0x20 | 3

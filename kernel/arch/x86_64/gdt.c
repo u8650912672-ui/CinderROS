@@ -44,7 +44,7 @@ void gdt_init(void) {
     set_entry64(5, (uint64_t)&tss, sizeof(struct tss) - 1, 0x89, 0x0); //then tss aka 0x28
     tss.iopb = sizeof(struct tss);
     extern uint64_t stack_top;
-    tss.rsp0 = stack_top; //set this shit later when i got a realstack i can point FIXED :thumbs_up:
+    tss.rsp0 = (uint64_t)&stack_top; //set this shit later when i got a realstack i can point FIXED :thumbs_up:
     struct gdt_ptr p = { sizeof(gdt) - 1, (uint64_t)&gdt };
     gdt_flush(&p);
     tss_flush();
