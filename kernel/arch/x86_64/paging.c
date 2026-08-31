@@ -4,7 +4,9 @@ __attribute__((aligned(4096)))
 static uint64_t extra_pdp[4][512];
 __attribute__((aligned(4096)))
 static uint64_t extra_pd[4][512];
-static unsigned npdp = 0, npd = 0;
+__attribute__((aligned(4096)))
+static uint64_t extra_pt[4][512];
+static unsigned npdp = 0, npd = 0, npt = 0;
 
 static uint64_t *pml4(void) {
     uint64_t cr3;
@@ -31,4 +33,39 @@ void map_page_2m(uint64_t phys) {
     p3[idx3] = (uint64_t)p2 | 0x3; //baby 0x3 :)
     p2[idx2] = (phys & 0x000FFFFFFFE00000ULL) | 0x83; //by ai this will work (it fucking wont) yes i use a bit of ai but i have barely used ai so far
     __asm__ volatile("invlpg (%0)" :: "r"(phys));
+}
+
+//marks exactly one 4k page as user accessible, splitting the boot 2m identity page
+static void mark_user_page(uint64_t phys) {
+    uint64_t *p4 = pml4();
+    uint64_t idx4 = (phys >> 39) & 0x1FF;
+    uint64_t idx3 = (phys >> 30) & 0x1FF;
+    uint64_t idx2 = (phys >> 21) & 0x1FF;
+    uint64_t idx1 = (phys >> 12) & 0x1FF;
+
+    p4[idx4] |= 0x4; 
+    uint64_t *p3 = (uint64_t *)(p4[idx4] & 0x000FFFFFFFFFF000ULL);
+    p3[idx3] |= 0x4;
+    uint64_t *p2 = (uint64_t *)(p3[idx3] & 0x000FFFFFFFFFF000ULL);
+
+    uint64_t *pt;
+    if (p2[idx2] & 0x80) {
+        // still a huge page, split into a 4k table before touching just one page
+        uint64_t base = p2[idx2] & 0x000FFFFFFFE00000ULL;
+        pt = alloc_table((uint64_t *)extra_pt, &npt);
+        for (int i = 0; i < 512; i++) {
+            pt[i] = (base + (uint64_t)i * 0x1000) | 0x3; // present+rw, still supervisor-only
+        }
+        p2[idx2] = (uint64_t)pt | 0x7;
+    } else {
+        pt = (uint64_t *)(p2[idx2] & 0x000FFFFFFFFFF000ULL);
+    }
+    pt[idx1] |= 0x4; // only this exact page becomes ring3 accessible
+    __asm__ volatile("invlpg (%0)" :: "r"(phys));
+}
+
+void map_user_range(uint64_t phys, uint64_t size) {
+    uint64_t start = phys & ~0xFFFULL;
+    uint64_t end = (phys + size + 0xFFF) & ~0xFFFULL;
+    for (uint64_t a = start; a < end; a += 0x1000) mark_user_page(a);
 }

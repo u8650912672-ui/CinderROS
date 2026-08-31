@@ -11,6 +11,10 @@ SECTIONS
     .text : ALIGN(4096) {
         *(.text .text.*)
     }
+    .usercode : ALIGN(4096) {
+        *(.usercode)
+        . = ALIGN(4096); /* keep this page free of any other kernel code */
+    }
     .rodata : ALIGN(4096) { *(.rodata .rodata.*) }
     .data : ALIGN(4096) { *(.data .data.*) }
     .bss : ALIGN(4096) {

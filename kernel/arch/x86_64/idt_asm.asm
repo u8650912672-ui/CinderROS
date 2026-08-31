@@ -33,3 +33,26 @@ isr_stub_%1:
 ISR_NOERR 32
 ISR_NOERR 33
     ;thanks jonathan the genius asm and keyboard helper
+
+extern syscall_handler
+global isr_syscall
+isr_syscall: 
+    push rcx
+    push rdx
+    push rsi
+    push rdi
+    push r8
+    push r9
+    push r10
+    push r11
+    mov rdi, rax
+    call syscall_handler
+    pop r11
+    pop r10
+    pop r9
+    pop r8
+    pop rdi
+    pop rsi
+    pop rdx
+    pop rcx
+    iretq
