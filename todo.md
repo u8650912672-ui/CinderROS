@@ -4,14 +4,11 @@
 
 
 # HIGH PRIORITY- 
-### Add shell in userspace stuff so shit dont run in ring0
-
-
+### fix commands for this project??
 
 
 # Medium priority-
-### fix the "poweroff" cmd from my shit as its currently the second reboot cmd :/
-### gdt.c set correct tss.rsp0 when i have a real stack
+### fix userspace # >
 
 
 
@@ -21,3 +18,5 @@
 
 # Alredy done stuff to show what i have done
 ### Commands.c the reboot command
+### gdt.c set correct tss.rsp0 when i have a real stack glowman :3
+### Add shell in userspace stuff so shit dont run in ring0

@@ -41,14 +41,13 @@ void irq_handler(uint64_t vector) {
     else if (vector == 33) kbd_irq();
     pic_eoi(vector - 32);
 }
-
-void idt_init(void) {
-    for (int i = 0; i < 256; i++)
-        idt_set_gate(i, (uint64_t)isr_stub_32); //default
-    idt_set_gate(33, (uint64_t)isr_stub_33); //keyboard mad keyboard want handler
-    idt_set_gate(0x80, (uint64_t)isr_syscall);
-    idt[0x80].attr |= 0x60; //DPL=3 to allow the userspace to call `int 0x80`
-
-    struct idt_ptr p = { sizeof(idt) - 1, (uint64_t)idt };
-    __asm__ volatile("lidt %0" :: "m"(p));
+extern void isr_stub_0(void); extern void isr_stub_6(void); extern void isr_stub_8(void); extern void isr_stub_13(void); extern void isr_stub_14(void);
+extern void isr_stub_13(void); extern void isr_stub_14(void);
+void idt_init(void){
+    for(int i=0;i<256;i++) idt_set_gate(i,(uint64_t)isr_stub_32);
+    idt_set_gate(0,(uint64_t)isr_stub_0); idt_set_gate(6,(uint64_t)isr_stub_6); idt_set_gate(8,(uint64_t)isr_stub_8); idt_set_gate(13,(uint64_t)isr_stub_13); idt_set_gate(14,(uint64_t)isr_stub_14);
+    idt_set_gate(33,(uint64_t)isr_stub_33);
+    idt_set_gate(0x80,(uint64_t)isr_syscall);
+    idt[0x80].attr |=0x60; // note cuz i will forget it the DPL3 MUST BE LAST or loop will overwrite it and ring3 int 0x80 will #GP err 402 cuz of the 0x80 vector IDT
+    
 }

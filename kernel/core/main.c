@@ -36,10 +36,5 @@ void kmain(uint64_t mb2) { //here da kernel starts this time it works
             else if (n < 31) { username[n++] = c; dputchar(c); }
         }
     }
-    if (str_eq(username, "gibmering0iamstupid")) {
-        shell_run();
-    } else {
-        dprint("entering userspace :3\n");
-        enter_userspace();
-    }
+    dprint("entering userspace now :3 \n"); enter_userspace(); for(;;) __asm__ volatile("hlt");
 }

@@ -18,7 +18,7 @@ void ser_print(const char *s);
 void printf(const char *fmt, ...);
 void map_page_2m(uint64_t phys);
 void map_user_range(uint64_t phys, uint64_t size);
-uint64_t syscall_handler(uint64_t num);
+uint64_t syscall_handler(uint64_t num, uint64_t a1);
 struct fb_info {
     uint64_t addr;
     uint32_t pitch;
